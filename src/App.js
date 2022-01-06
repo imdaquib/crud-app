@@ -1,120 +1,125 @@
-import React,{useState, useEffect} from "react";
-import AddUserForm from "./forms/AddForm";
-import EditForm from "./forms/EditForm";
-import UserTable from "./UserTable";
+import React, { useState, useEffect } from 'react';
+import AddUserForm from './forms/AddForm';
+import EditForm from './forms/EditForm';
+import UserTable from './UserTable';
 
-const App =() =>{
-      const userdata = [
-            // {id:1, name:'Shahan',gender:'Male', job:'Actor', country:'Istanbul'}
-      ]
+const App = () => {
+  const userdata = [
+    // {id:1, name:'Shahan',gender:'Male', job:'Actor', country:'Istanbul'}
+  ];
 
-      const initialFormState = {id:null, name:'', gender:'',job:'',country:''}
-      const [users, setUsers] = useState(userdata)
-      const [editing, setEditing] = useState(false)
-      const [currentUser, setCurrentUser] = useState(initialFormState)
+  const initialFormState = {
+    id: null,
+    name: '',
+    gender: '',
+    job: '',
+    country: '',
+  };
+  const [users, setUsers] = useState(userdata);
+  const [editing, setEditing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(initialFormState);
 
+  // Show data
+  useEffect(() => {
+    const showData = async () => {
+      const dataFromdb = await FetchData();
+      setUsers(dataFromdb);
+    };
+    showData();
+  }, []);
 
-            // Show data
-     useEffect(() => {
-      const showData = async() =>{
-            const dataFromdb = await FetchData()
-            setUsers(dataFromdb)
-      }
-      showData()
-     }, [])
+  /// Fetch data from db.json
+  const FetchData = async () => {
+    const res = await fetch('http://localhost:5000/datas');
+    const data = res.json();
 
-      /// Fetch data from db.json
-      const FetchData = async() =>{
-            const res = await fetch('http://localhost:5000/datas')
-            const data = res.json();
+    return data;
+  };
 
-            return data;
-      }
+  /// add user
+  const addUser = async (user) => {
+    const res = await fetch('http://localhost:5000/datas', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'Application/json',
+      },
+      body: JSON.stringify(user),
+    });
 
+    const data = await res.json();
 
+    setUsers([...users, data]);
+  };
 
+  // delete User
+  const deleteUser = async (id) => {
+    await fetch(`http://localhost:5000/datas/${id}`, {
+      method: 'delete',
+    });
 
-     /// add user
-     const addUser = async(user) =>{
-            const res = await fetch('http://localhost:5000/datas',{
-                  method:'POST',
-                  headers:{
-                        'Content-type':'Application/json'
-                  },
-                  body: JSON.stringify(user)
-            })
+    setUsers(users.filter((user) => user.id !== id));
+  };
 
-            const data = await res.json();
+  /// edit Mode
+  const editMode = (user) => {
+    setEditing(true);
 
-            setUsers([...users, data])
-     }
+    setCurrentUser({
+      id: user.id,
+      name: user.name,
+      gender: user.gender,
+      job: user.job,
+      country: user.country,
+    });
+  };
 
-     // delete User
-     const deleteUser = async(id) =>{
-           await fetch(`http://localhost:5000/datas/${id}`,{
-                 method:'delete'
-           })
+  /// Update User
+  const updateUser = async (id, dataUpdate) => {
+    setEditing(false);
 
-           setUsers(users.filter(user => user.id !== id))
-     }
+    const res = await fetch(`http://localhost:5000/datas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'Application/json',
+      },
+      body: JSON.stringify(dataUpdate),
+    });
+    const data = await res.json();
+    setUsers(users.map((user) => (user.id === id ? data : user)));
+  };
 
-     /// edit Mode
-     const editMode = (user) =>{
-            setEditing(true)
+  return (
+    <div className='container mt-4'>
+      <h1>CRUD APP</h1>
 
-            setCurrentUser({id:user.id, name:user.name, gender:user.gender, job:user.job, country:user.country})
-     }
+      <div className='row mt-4'>
+        {editing ? (
+          <div className='col-md-6'>
+            <h2>Edit User</h2>
+            <EditForm
+              setEditing={setEditing}
+              currentUser={currentUser}
+              updateUser={updateUser}
+            />
+          </div>
+        ) : (
+          <div className='col-md-6'>
+            <h2>Add User</h2>
+            <AddUserForm addUser={addUser} />
+          </div>
+        )}
 
-     /// Update User
-     const updateUser = async (id, dataUpdate) =>{
-           setEditing(false)
+        <div className='col-md-6'>
+          <h2>View User</h2>
+          <UserTable
+            myuser={users}
+            deleteUser={deleteUser}
+            editMode={editMode}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
-           const res = await fetch(`http://localhost:5000/datas/${id}`,{
-                 method:'PUT',
-                 headers:{
-                       'Content-type':'Application/json'
-                 },
-                 body: JSON.stringify(dataUpdate)
-           })
-           const data = await res.json();
-           setUsers(users.map(user => user.id === id ? data : user))
-     }
-
-      return(
-            <div className="container mt-4">
-            <h1>CRUD APP</h1>
-            
-                  <div className="row mt-4">
-                  {editing ? (
-                       <div className="col-md-6">
-                        <h2>Edit User</h2>
-                        <EditForm 
-                              setEditing={setEditing}
-                              currentUser={currentUser}
-                              updateUser={updateUser}
-                              />
-                        </div>
-                  ):(
-                        <div className="col-md-6">
-                        <h2>Add User</h2>
-                        <AddUserForm addUser={addUser}/>
-                    </div>
-                  )}
-                     
-
-                      <div className="col-md-6">
-                          <h2>View User</h2>
-                          <UserTable 
-                          myuser={users}
-                          deleteUser={deleteUser}
-                          editMode={editMode}
-                          />
-                      </div>
-
-                  </div>
-            </div>
-           
-      )
-}
-
-export default App
+export default App;
