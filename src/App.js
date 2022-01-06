@@ -90,7 +90,7 @@ const App = () => {
 
   return (
     <div className='container mt-4'>
-      <h1>CRUD APP</h1>
+      <h1>CRUD REACT APP</h1>
 
       <div className='row mt-4'>
         {editing ? (
