@@ -95,7 +95,7 @@ const App = () => {
       <div className='row mt-4'>
         {editing ? (
           <div className='col-md-6'>
-            <h2>Edit User</h2>
+            <h2>Edit Users</h2>
             <EditForm
               setEditing={setEditing}
               currentUser={currentUser}
