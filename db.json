@@ -1,0 +1,25 @@
+{
+  "datas": [
+    {
+      "id": 1,
+      "name": "Tony Stark",
+      "gender": "Male",
+      "job": "Iron Man",
+      "country": "Chicago"
+    },
+    {
+      "id": 2,
+      "name": "Kabir Singh",
+      "gender": "Male",
+      "job": "Actor",
+      "country": "Turkey"
+    },
+    {
+      "id": 3,
+      "name": "Riya Somani",
+      "gender": "Female",
+      "job": "Engineer",
+      "country": "England"
+    }
+  ]
+}
